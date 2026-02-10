@@ -1,27 +1,22 @@
-const CACHE_NAME = "ceralune-v1";
-const OFFLINE_URL = "./offline.html";
-
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./offline.html",
-  "./style.css",
-  "./app.js",
-  "./manifest.json"
-];
+const CACHE = "ceralune-v1";
+const OFFLINE_URL = "offline.html";
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE).then(cache =>
+      cache.addAll([
+        "./",
+        "./index.html",
+        "./offline.html",
+        "./manifest.json"
+      ])
+    )
   );
+  self.skipWaiting();
 });
 
 self.addEventListener("fetch", event => {
   event.respondWith(
-    fetch(event.request).catch(() => {
-      return caches.match(event.request).then(response => {
-        return response || caches.match(OFFLINE_URL);
-      });
-    })
+    fetch(event.request).catch(() => caches.match(event.request).then(r => r || caches.match(OFFLINE_URL)))
   );
 });
