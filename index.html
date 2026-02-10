@@ -1,8 +1,46 @@
-<link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#6b5cff" />
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mes Routines – Créations personnelles</title>
 
-<button id="notif">Activer les rappels</button>
-<div id="planning"></div>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6b5cff">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="appbar" role="banner">
+  <div class="appbar-inner">
+    <a class="logo" href="index.html" title="Accueil">
+      <img src="assets/images/logo.png" alt="logo" class="logo-img">
+      <span class="brand-title">MES ROUTINES</span>
+    </a>
+
+    <div class="header-actions">
+      <button id="btnNotif" class="btn btn-primary">⏰ Activer rappels</button>
+    </div>
+  </div>
+
+  <div class="top-controls">
+    <select id="daySelect">
+      <option value="lundi">Lundi</option>
+      <option value="mardi">Mardi</option>
+      <option value="mercredi">Mercredi</option>
+      <option value="jeudi">Jeudi</option>
+      <option value="vendredi">Vendredi</option>
+    </select>
+
+    <button id="btnAuto" class="btn btn-surprise">🤖 Aujourd’hui sans réfléchir</button>
+  </div>
+</header>
+
+<main class="container" role="main">
+  <div id="routineList" class="routines-grid" aria-live="polite"></div>
+</main>
 
 <script src="app.js"></script>
-
+</body>
+</html>
