@@ -100,3 +100,6 @@ if (routines[today]) {
 } else {
   renderDay("lundi");
 }
+window.addEventListener("offline", () => {
+  alert("🌙 Tu es hors connexion – Ceralune reste dispo !");
+});
