@@ -32,6 +32,10 @@ const routineList = document.getElementById("routineList");
 const daySelect = document.getElementById("daySelect");
 const btnFatigue = document.getElementById("btnFatigue");
 const btnNotif = document.getElementById("btnNotif");
+const saved = localStorage.getItem("routinesData");
+if(saved){
+  Object.assign(routines, JSON.parse(saved));
+}
 
 function keyFor(day, idx){
   return `done-${day}-${idx}`;
@@ -102,4 +106,70 @@ if (routines[today]) {
 }
 window.addEventListener("offline", () => {
   alert("🌙 Tu es hors connexion – Ceralune reste dispo !");
+});
+const btnEdit = document.getElementById("btnEdit");
+const editModal = document.getElementById("editModal");
+const btnCloseEdit = document.getElementById("btnCloseEdit");
+const routineEditor = document.getElementById("routineEditor");
+const daySelectEdit = document.getElementById("daySelectEdit");
+const btnAddRoutine = document.getElementById("btnAddRoutine");
+const btnSaveEdit = document.getElementById("btnSaveEdit");
+
+// ouvrir/fermer modal
+btnEdit.addEventListener("click", () => {
+  editModal.style.display = "flex";
+  loadEditor(daySelectEdit.value);
+});
+btnCloseEdit.addEventListener("click", () => editModal.style.display = "none");
+
+// charger les routines dans l'éditeur
+function loadEditor(day) {
+  routineEditor.innerHTML = "";
+  const list = routines[day] || [];
+  list.forEach((item, idx) => {
+    addRoutineRow(item.time, item.label, item.type, idx);
+  });
+}
+
+// ajouter une ligne dans l'éditeur
+function addRoutineRow(time="", label="", type="cerveau", idx=null) {
+  const div = document.createElement("div");
+  div.className = "routine-edit-row";
+  div.innerHTML = `
+    <input type="time" value="${time}" class="edit-time"/>
+    <input type="text" value="${label}" placeholder="Label" class="edit-label"/>
+    <select class="edit-type">
+      <option value="cerveau" ${type==="cerveau"?"selected":""}>Cerveau</option>
+      <option value="menage" ${type==="menage"?"selected":""}>Ménage</option>
+      <option value="sport" ${type==="sport"?"selected":""}>Sport</option>
+    </select>
+    <button class="btn btn-surprise btn-delete">❌</button>
+    <hr/>
+  `;
+  routineEditor.appendChild(div);
+
+  div.querySelector(".btn-delete").addEventListener("click", () => div.remove());
+}
+
+// bouton ajouter activité
+btnAddRoutine.addEventListener("click", () => addRoutineRow());
+
+// changer de jour
+daySelectEdit.addEventListener("change", () => loadEditor(daySelectEdit.value));
+
+// sauvegarder
+btnSaveEdit.addEventListener("click", () => {
+  const day = daySelectEdit.value;
+  const rows = routineEditor.querySelectorAll(".routine-edit-row");
+  const newRoutines = [];
+  rows.forEach(r => {
+    const time = r.querySelector(".edit-time").value;
+    const label = r.querySelector(".edit-label").value;
+    const type = r.querySelector(".edit-type").value;
+    if(time && label) newRoutines.push({time,label,type});
+  });
+  routines[day] = newRoutines;
+  localStorage.setItem("routinesData", JSON.stringify(routines)); // sauvegarde persistante
+  editModal.style.display = "none";
+  if(daySelect.value === day) renderDay(day); // refresh affichage
 });
