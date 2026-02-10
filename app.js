@@ -135,41 +135,57 @@ function loadEditor(day) {
 function addRoutineRow(time="", label="", type="cerveau", idx=null) {
   const div = document.createElement("div");
   div.className = "routine-edit-row";
+  div.draggable = true;  // rendre draggable
   div.innerHTML = `
     <input type="time" value="${time}" class="edit-time"/>
     <input type="text" value="${label}" placeholder="Label" class="edit-label"/>
     <select class="edit-type">
-      <option value="cerveau" ${type==="cerveau"?"selected":""}>Cerveau</option>
+      <option value="cerveau" ${type==="cerveau"?"selected":""}>Administratif</option>
+       <option value="cerveau" ${type==="cerveau"?"selected":""}>Formation</option>
       <option value="menage" ${type==="menage"?"selected":""}>Ménage</option>
       <option value="sport" ${type==="sport"?"selected":""}>Sport</option>
+      <option value="sport" ${type==="sport"?"selected":""}>Création</option>
     </select>
     <button class="btn btn-surprise btn-delete">❌</button>
     <hr/>
   `;
   routineEditor.appendChild(div);
 
+  // suppression
   div.querySelector(".btn-delete").addEventListener("click", () => div.remove());
+
+  // --- Drag & Drop ---
+  div.addEventListener("dragstart", e => {
+    div.classList.add("dragging");
+  });
+
+  div.addEventListener("dragend", e => {
+    div.classList.remove("dragging");
+  });
 }
 
-// bouton ajouter activité
-btnAddRoutine.addEventListener("click", () => addRoutineRow());
-
-// changer de jour
-daySelectEdit.addEventListener("change", () => loadEditor(daySelectEdit.value));
-
-// sauvegarder
-btnSaveEdit.addEventListener("click", () => {
-  const day = daySelectEdit.value;
-  const rows = routineEditor.querySelectorAll(".routine-edit-row");
-  const newRoutines = [];
-  rows.forEach(r => {
-    const time = r.querySelector(".edit-time").value;
-    const label = r.querySelector(".edit-label").value;
-    const type = r.querySelector(".edit-type").value;
-    if(time && label) newRoutines.push({time,label,type});
-  });
-  routines[day] = newRoutines;
-  localStorage.setItem("routinesData", JSON.stringify(routines)); // sauvegarde persistante
-  editModal.style.display = "none";
-  if(daySelect.value === day) renderDay(day); // refresh affichage
+// gestion du drop sur le conteneur
+routineEditor.addEventListener("dragover", e => {
+  e.preventDefault();
+  const afterElement = getDragAfterElement(routineEditor, e.clientY);
+  const dragging = routineEditor.querySelector(".dragging");
+  if(afterElement == null){
+    routineEditor.appendChild(dragging);
+  } else {
+    routineEditor.insertBefore(dragging, afterElement);
+  }
 });
+
+// helper pour savoir où insérer
+function getDragAfterElement(container, y){
+  const draggableElements = [...container.querySelectorAll(".routine-edit-row:not(.dragging)")];
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height/2;
+    if(offset < 0 && offset > closest.offset){
+      return {offset: offset, element: child};
+    } else {
+      return closest;
+    }
+  }, {offset: Number.NEGATIVE_INFINITY}).element;
+}
