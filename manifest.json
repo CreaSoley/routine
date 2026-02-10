@@ -1,6 +1,6 @@
 {
-  "name": "Mes Routines",
-  "short_name": "Routines",
+  "name": "Ceralune",
+  "short_name": "Ceralune",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
