@@ -36,6 +36,7 @@
 
     <button id="btnAuto" class="btn btn-surprise">🤖 Aujourd’hui sans réfléchir</button>
     <button id="btnFatigue" class="btn">🔋 Mode fatigue</button>
+    <button id="btnEdit" class="btn btn-primary">✏️ Éditer routines</button>
 
   </div>
 </header>
@@ -43,6 +44,25 @@
 <main class="container" role="main">
   <div id="routineList" class="routines-grid" aria-live="polite"></div>
 </main>
+<div id="editModal" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h2>Modifier les routines</h2>
+    <label for="daySelectEdit">Jour :</label>
+    <select id="daySelectEdit">
+      <option value="lundi">Lundi</option>
+      <option value="mardi">Mardi</option>
+      <option value="mercredi">Mercredi</option>
+      <option value="jeudi">Jeudi</option>
+      <option value="vendredi">Vendredi</option>
+    </select>
+    <div id="routineEditor"></div>
+    <button id="btnAddRoutine" class="btn">➕ Ajouter activité</button>
+    <div style="margin-top:10px;">
+      <button id="btnSaveEdit" class="btn btn-primary">💾 Sauvegarder</button>
+      <button id="btnCloseEdit" class="btn btn-surprise">❌ Fermer</button>
+    </div>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>
