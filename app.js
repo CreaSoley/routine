@@ -1,3 +1,5 @@
+let fatigueMode = false;
+
 const routines = {
   lundi: [
     { time: "09:00", label: "🎓 Formation Mediatic", type: "cerveau" },
@@ -28,6 +30,8 @@ const routines = {
 
 const routineList = document.getElementById("routineList");
 const daySelect = document.getElementById("daySelect");
+const btnFatigue = document.getElementById("btnFatigue");
+const btnNotif = document.getElementById("btnNotif");
 
 function keyFor(day, idx){
   return `done-${day}-${idx}`;
@@ -35,7 +39,9 @@ function keyFor(day, idx){
 
 function renderDay(day){
   routineList.innerHTML = "";
-  routines[day].forEach((item, idx) => {
+  const list = fatigueMode ? routines[day].slice(0, 1) : routines[day];
+
+  list.forEach((item, idx) => {
     const doneKey = keyFor(day, idx);
     const isDone = localStorage.getItem(doneKey) === "1";
 
@@ -65,6 +71,19 @@ function renderDay(day){
 
 daySelect.addEventListener("change", e => renderDay(e.target.value));
 
+btnFatigue.addEventListener("click", () => {
+  fatigueMode = !fatigueMode;
+  btnFatigue.textContent = fatigueMode ? "😴 Mode normal" : "🔋 Mode fatigue";
+  renderDay(daySelect.value);
+});
+
+btnNotif.addEventListener("click", async () => {
+  const permission = await Notification.requestPermission();
+  if (permission === "granted") {
+    alert("Rappels activés !");
+  }
+});
+
 // auto jour courant
 const days = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
 const today = days[new Date().getDay()];
@@ -74,29 +93,3 @@ if (routines[today]) {
 } else {
   renderDay("lundi");
 }
-
-document.getElementById("btnNotif").addEventListener("click", async () => {
-  const permission = await Notification.requestPermission();
-  if (permission === "granted") {
-    alert("Rappels activés !");
-  }
-});
-let fatigueMode = false;
-
-document.getElementById("btnFatigue").addEventListener("click", () => {
-  fatigueMode = !fatigueMode;
-  document.getElementById("btnFatigue").textContent = fatigueMode ? "😴 Mode normal" : "🔋 Mode fatigue";
-  renderDay(daySelect.value);
-});
-
-// Dans renderDay, remplace le forEach par :
-function renderDay(day){
-  routineList.innerHTML = "";
-  const list = fatigueMode ? routines[day].slice(0, 1) : routines[day];
-
-  list.forEach((item, idx) => {
-    // même code que plus haut
-  });
-}
-
-
