@@ -16,7 +16,7 @@
 /* Spicy font (assure-toi d'avoir assets/fonts/Spicy Sale.ttf) */
 @font-face{
   font-family:"SpicySale";
-  src: url("assets/fonts/Spicy Sale.ttf") format("truetype");
+  src: url("Spicy Sale.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
