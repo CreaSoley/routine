@@ -36,6 +36,13 @@ const btnNotif = document.getElementById("btnNotif");
 function keyFor(day, idx){
   return `done-${day}-${idx}`;
 }
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(() => console.log("✅ Service Worker enregistré"))
+      .catch(err => console.error("❌ SW error", err));
+  });
+}
 
 function renderDay(day){
   routineList.innerHTML = "";
