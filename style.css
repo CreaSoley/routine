@@ -330,3 +330,28 @@ select{
   border-radius:6px;
   border:1px solid #ccc;
 }
+.routine-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  cursor: grab;
+  background: #f8f8f8;
+  border-radius: 8px;
+}
+
+.routine-edit-row.dragging {
+  opacity: 0.5;
+  background: #e0e0ff;
+}
+
+.routine-edit-row input,
+.routine-edit-row select {
+  flex: 1;
+}
+
+.routine-edit-row hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 4px 0;
+}
