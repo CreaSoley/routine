@@ -1,33 +1,64 @@
-const calendar=document.getElementById("calendar")
+let fatigueMode=false
 
 const days=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
 
-let routines=JSON.parse(localStorage.getItem("routinesData")||`{
-"lundi":[
-{"time":"09:00","label":"🎓 Formation","type":"cerveau","week":"pair"},
-{"time":"11:00","label":"🧹 Sols","type":"menage","week":"all"}
+/* programmation de base semaine A / B */
+
+let routines={
+lundi:[
+{time:"08:00",label:"🧹 Ménage",type:"menage",week:"all"},
+{time:"09:00",label:"🥋 Arts Martiaux",type:"sport",week:"all"},
+{time:"09:30",label:"🤸 Aérobic",type:"sport",week:"all"},
+{time:"10:20",label:"💻 Programmation",type:"cerveau",week:"all"},
+{time:"14:00",label:"📚 Formation Bibliothèque",type:"cerveau",week:"pair"},
+{time:"14:00",label:"🧏 LSF + Rangement Bureau",type:"cerveau",week:"impair"},
+{time:"16:15",label:"🧘 Pilates",type:"sport",week:"all"}
 ],
-"mardi":[
-{"time":"09:00","label":"🎨 Créatif","type":"cerveau","week":"all"}
+
+mardi:[
+{time:"08:00",label:"🧹 Ménage",type:"menage",week:"all"},
+{time:"09:00",label:"🥋 Arts Martiaux",type:"sport",week:"all"},
+{time:"09:30",label:"🤸 Aérobic",type:"sport",week:"all"},
+{time:"10:20",label:"💻 Programmation",type:"cerveau",week:"all"},
+{time:"14:00",label:"🎓 Formation",type:"cerveau",week:"all"},
+{time:"16:15",label:"🧘 Pilates",type:"sport",week:"all"}
 ],
-"mercredi":[
-{"time":"09:00","label":"💻 Codage","type":"cerveau","week":"all"}
+
+mercredi:[
+{time:"11:00",label:"🧺 Lessive tapis cochons d’inde",type:"menage",week:"all"},
+{time:"11:30",label:"📚 Formation Bibliothèque",type:"cerveau",week:"all"}
 ],
-"jeudi":[
-{"time":"09:00","label":"🎓 Formation","type":"cerveau","week":"impair"}
+
+jeudi:[
+{time:"14:00",label:"💻 Programmation",type:"cerveau",week:"pair"},
+{time:"14:00",label:"🎨 Art Journal",type:"cerveau",week:"impair"}
 ],
-"vendredi":[
-{"time":"09:00","label":"🗂️ Secrétariat","type":"cerveau","week":"all"}
+
+vendredi:[
+{time:"14:00",label:"🎨 Peinture",type:"cerveau",week:"pair"},
+{time:"14:00",label:"📚 Formation Bibliothèque",type:"cerveau",week:"impair"}
 ]
-}`)
+}
+
+/* stockage */
 
 let exceptions=JSON.parse(localStorage.getItem("exceptions")||"{}")
+let formationThemes=JSON.parse(localStorage.getItem("formationThemes")||"{}")
+
+/* DOM */
+
+const routineList=document.getElementById("routineList")
+const daySelect=document.getElementById("daySelect")
+const dateSelect=document.getElementById("dateSelect")
+
+/* calcul semaine */
 
 function getWeekNumber(date){
 
 const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()))
 const dayNum=d.getUTCDay()||7
 d.setUTCDate(d.getUTCDate()+4-dayNum)
+
 const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1))
 
 return Math.ceil((((d-yearStart)/86400000)+1)/7)
@@ -40,14 +71,16 @@ return getWeekNumber(date)%2===0?"pair":"impair"
 
 }
 
+/* routines pour une date */
+
 function routinesForDate(date){
 
 const day=days[date.getDay()]
 const weekType=getWeekType(date)
 
-let list=[...(routines[day]||[])]
-
-list=list.filter(r=>r.week==="all"||r.week===weekType)
+let list=(routines[day]||[]).filter(r=>{
+return r.week==="all"||r.week===weekType
+})
 
 const key=date.toISOString().slice(0,10)
 
@@ -61,86 +94,126 @@ return list
 
 }
 
-function renderCalendar(){
+/* affichage */
 
-calendar.innerHTML=""
+function renderDay(date){
 
-const start=new Date()
+const day=days[date.getDay()]
 
-for(let i=0;i<56;i++){
+daySelect.value=day
 
-const date=new Date(start)
-date.setDate(start.getDate()+i)
+routineList.innerHTML=""
 
-const div=document.createElement("div")
+let list=routinesForDate(date)
 
-div.className="day"
-
-if(date.toDateString()===new Date().toDateString()){
-div.classList.add("today")
+if(fatigueMode){
+list=list.slice(0,1)
 }
 
-const header=document.createElement("div")
-header.className="day-header"
+list.forEach((item)=>{
 
-header.textContent=date.toLocaleDateString("fr-FR",{
-weekday:"short",
-day:"numeric",
-month:"short"
-})
+const card=document.createElement("div")
 
-div.appendChild(header)
+card.className=`routine-card routine-${item.type}`
 
-const list=routinesForDate(date)
+let label=item.label
 
-list.forEach(r=>{
+/* thème formation */
 
-const e=document.createElement("div")
-e.className="event event-"+r.type
-
-e.textContent=r.time+" "+r.label
-
-div.appendChild(e)
-
-})
-
-div.addEventListener("click",()=>editDay(date))
-
-calendar.appendChild(div)
-
-}
-
-}
-
-function editDay(date){
-
-const label=prompt("Nouvelle activité exceptionnelle")
-
-if(!label)return
+if(label.includes("Formation")){
 
 const key=date.toISOString().slice(0,10)
 
-if(!exceptions[key])exceptions[key]=[]
+if(formationThemes[key]){
 
-exceptions[key].push({
-time:"09:00",
-label:label,
-type:"cerveau"
-})
-
-localStorage.setItem("exceptions",JSON.stringify(exceptions))
-
-renderCalendar()
+label+=`<br><small>${formationThemes[key]}</small>`
 
 }
 
-document.getElementById("btnAddException").addEventListener("click",()=>{
+}
 
-const date=prompt("Date exception (AAAA-MM-JJ)")
+card.innerHTML=`
 
-if(!date)return
+<div class="routine-left">
+<div class="routine-time">${item.time}</div>
+<div class="routine-label">${label}</div>
+</div>
 
-const label=prompt("Nom activité")
+`
+
+routineList.appendChild(card)
+
+})
+
+}
+
+/* choix date */
+
+dateSelect.addEventListener("change",()=>{
+
+const d=new Date(dateSelect.value)
+
+renderDay(d)
+
+})
+
+/* aujourd'hui */
+
+document.getElementById("btnToday").addEventListener("click",()=>{
+
+const today=new Date()
+
+dateSelect.value=today.toISOString().slice(0,10)
+
+renderDay(today)
+
+})
+
+/* fatigue */
+
+document.getElementById("btnFatigue").addEventListener("click",()=>{
+
+fatigueMode=!fatigueMode
+
+renderDay(new Date(dateSelect.value))
+
+})
+
+/* thème formation */
+
+document.getElementById("btnTheme").addEventListener("click",()=>{
+
+const date=dateSelect.value
+
+if(!date){
+alert("Choisis une date")
+return
+}
+
+const theme=prompt("Thème de la formation")
+
+if(!theme)return
+
+formationThemes[date]=theme
+
+localStorage.setItem("formationThemes",JSON.stringify(formationThemes))
+
+renderDay(new Date(date))
+
+})
+
+/* exception */
+
+document.getElementById("btnException").addEventListener("click",()=>{
+
+const date=dateSelect.value
+
+if(!date){
+alert("Choisis une date")
+return
+}
+
+const label=prompt("Activité exceptionnelle")
 
 if(!label)return
 
@@ -154,14 +227,14 @@ type:"cerveau"
 
 localStorage.setItem("exceptions",JSON.stringify(exceptions))
 
-renderCalendar()
+renderDay(new Date(date))
 
 })
 
-document.getElementById("btnToday").addEventListener("click",()=>{
+/* démarrage */
 
-window.scrollTo({top:0,behavior:"smooth"})
+const today=new Date()
 
-})
+dateSelect.value=today.toISOString().slice(0,10)
 
-renderCalendar()
+renderDay(today)
