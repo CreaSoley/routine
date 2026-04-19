@@ -1,191 +1,178 @@
-let fatigueMode = false;
+let fatigueMode=false
 
-const routines = {
-  lundi: [
-    { time: "09:00", label: "🎓 Formation Mediatic", type: "cerveau" },
-    { time: "11:00", label: "🧹 Sols", type: "menage" },
-    { time: "14:00", label: "🥋 Sport / Tai Jitsu", type: "sport" },
-  ],
-  mardi: [
-    { time: "09:00", label: "🎨 Créatif", type: "cerveau" },
-    { time: "11:00", label: "🧹 Salle de bain", type: "menage" },
-    { time: "14:00", label: "🎨 Créatif libre", type: "cerveau" },
-  ],
-  mercredi: [
-    { time: "09:00", label: "💻 Codage", type: "cerveau" },
-    { time: "11:00", label: "🧹 Cuisine", type: "menage" },
-    { time: "11:30", label: "🎓 Formation Mediatic", type: "cerveau" },
-  ],
-  jeudi: [
-    { time: "09:00", label: "🎓 Formation Mediatic", type: "cerveau" },
-    { time: "11:00", label: "🧹 Linge", type: "menage" },
-    { time: "14:00", label: "🎨 Créatif doux", type: "cerveau" },
-  ],
-  vendredi: [
-    { time: "09:00", label: "🗂️ Secrétariat / Créatif", type: "cerveau" },
-    { time: "11:00", label: "🧹 Bazar + poubelles", type: "menage" },
-    { time: "14:00", label: "🎉 Plaisir / OFF", type: "sport" },
-  ],
-};
+const days=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"]
 
-const routineList = document.getElementById("routineList");
-const daySelect = document.getElementById("daySelect");
-const btnFatigue = document.getElementById("btnFatigue");
-const btnNotif = document.getElementById("btnNotif");
-const saved = localStorage.getItem("routinesData");
-if(saved){
-  Object.assign(routines, JSON.parse(saved));
+const routines={
+lundi:[
+{time:"09:00",label:"🎓 Formation Mediatic",type:"cerveau",week:"pair"},
+{time:"11:00",label:"🧹 Sols",type:"menage",week:"all"},
+{time:"14:00",label:"🥋 Sport",type:"sport",week:"all"}
+],
+mardi:[
+{time:"09:00",label:"🎨 Créatif",type:"cerveau",week:"all"},
+{time:"11:00",label:"🧹 Salle de bain",type:"menage",week:"all"},
+{time:"14:00",label:"🎨 Créatif libre",type:"cerveau",week:"all"}
+],
+mercredi:[
+{time:"09:00",label:"💻 Codage",type:"cerveau",week:"all"},
+{time:"11:00",label:"🧹 Cuisine",type:"menage",week:"all"},
+{time:"11:30",label:"🎓 Formation",type:"cerveau",week:"impair"}
+],
+jeudi:[
+{time:"09:00",label:"🎓 Formation",type:"cerveau",week:"pair"},
+{time:"11:00",label:"🧹 Linge",type:"menage",week:"all"},
+{time:"14:00",label:"🎨 Créatif doux",type:"cerveau",week:"all"}
+],
+vendredi:[
+{time:"09:00",label:"🗂️ Secrétariat",type:"cerveau",week:"all"},
+{time:"11:00",label:"🧹 Bazar",type:"menage",week:"all"},
+{time:"14:00",label:"🎉 OFF",type:"sport",week:"all"}
+]
 }
 
-function keyFor(day, idx){
-  return `done-${day}-${idx}`;
-}
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js")
-      .then(() => console.log("✅ Service Worker enregistré"))
-      .catch(err => console.error("❌ SW error", err));
-  });
-}
+let exceptions=JSON.parse(localStorage.getItem("exceptions")||"{}")
 
-function renderDay(day){
-  routineList.innerHTML = "";
-  const list = fatigueMode ? routines[day].slice(0, 1) : routines[day];
+const routineList=document.getElementById("routineList")
+const daySelect=document.getElementById("daySelect")
+const dateSelect=document.getElementById("dateSelect")
+const btnFatigue=document.getElementById("btnFatigue")
+const btnPlanning=document.getElementById("btnPlanning")
+const planning8=document.getElementById("planning8")
 
-  list.forEach((item, idx) => {
-    const doneKey = keyFor(day, idx);
-    const isDone = localStorage.getItem(doneKey) === "1";
-
-    const card = document.createElement("div");
-    card.className = `routine-card routine-${item.type} ${isDone ? "done" : ""}`;
-
-    card.innerHTML = `
-      <div class="routine-left">
-        <div class="routine-time">${item.time}</div>
-        <div class="routine-label">${item.label}</div>
-      </div>
-      <label class="routine-done">
-        <input type="checkbox" ${isDone ? "checked" : ""}/>
-        fait
-      </label>
-    `;
-
-    const checkbox = card.querySelector("input");
-    checkbox.addEventListener("change", () => {
-      localStorage.setItem(doneKey, checkbox.checked ? "1" : "0");
-      card.classList.toggle("done", checkbox.checked);
-    });
-
-    routineList.appendChild(card);
-  });
+function getWeekNumber(date){
+const d=new Date(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate()))
+const dayNum=d.getUTCDay()||7
+d.setUTCDate(d.getUTCDate()+4-dayNum)
+const yearStart=new Date(Date.UTC(d.getUTCFullYear(),0,1))
+return Math.ceil((((d-yearStart)/86400000)+1)/7)
 }
 
-daySelect.addEventListener("change", e => renderDay(e.target.value));
-
-btnFatigue.addEventListener("click", () => {
-  fatigueMode = !fatigueMode;
-  btnFatigue.textContent = fatigueMode ? "😴 Mode normal" : "🔋 Mode fatigue";
-  renderDay(daySelect.value);
-});
-
-btnNotif.addEventListener("click", async () => {
-  const permission = await Notification.requestPermission();
-  if (permission === "granted") {
-    alert("Rappels activés !");
-  }
-});
-
-// auto jour courant
-const days = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
-const today = days[new Date().getDay()];
-if (routines[today]) {
-  daySelect.value = today;
-  renderDay(today);
-} else {
-  renderDay("lundi");
-}
-window.addEventListener("offline", () => {
-  alert("🌙 Tu es hors connexion – Ceralune reste dispo !");
-});
-const btnEdit = document.getElementById("btnEdit");
-const editModal = document.getElementById("editModal");
-const btnCloseEdit = document.getElementById("btnCloseEdit");
-const routineEditor = document.getElementById("routineEditor");
-const daySelectEdit = document.getElementById("daySelectEdit");
-const btnAddRoutine = document.getElementById("btnAddRoutine");
-const btnSaveEdit = document.getElementById("btnSaveEdit");
-
-// ouvrir/fermer modal
-btnEdit.addEventListener("click", () => {
-  editModal.style.display = "flex";
-  loadEditor(daySelectEdit.value);
-});
-btnCloseEdit.addEventListener("click", () => editModal.style.display = "none");
-
-// charger les routines dans l'éditeur
-function loadEditor(day) {
-  routineEditor.innerHTML = "";
-  const list = routines[day] || [];
-  list.forEach((item, idx) => {
-    addRoutineRow(item.time, item.label, item.type, idx);
-  });
+function getWeekType(date){
+return getWeekNumber(date)%2===0?"pair":"impair"
 }
 
-// ajouter une ligne dans l'éditeur
-function addRoutineRow(time="", label="", type="cerveau", idx=null) {
-  const div = document.createElement("div");
-  div.className = "routine-edit-row";
-  div.draggable = true;  // rendre draggable
-  div.innerHTML = `
-    <input type="time" value="${time}" class="edit-time"/>
-    <input type="text" value="${label}" placeholder="Label" class="edit-label"/>
-    <select class="edit-type">
-      <option value="cerveau" ${type==="cerveau"?"selected":""}>Administratif</option>
-       <option value="cerveau" ${type==="cerveau"?"selected":""}>Formation</option>
-      <option value="menage" ${type==="menage"?"selected":""}>Ménage</option>
-      <option value="sport" ${type==="sport"?"selected":""}>Sport</option>
-      <option value="sport" ${type==="sport"?"selected":""}>Création</option>
-    </select>
-    <button class="btn btn-surprise btn-delete">❌</button>
-    <hr/>
-  `;
-  routineEditor.appendChild(div);
+function routinesForDate(date){
 
-  // suppression
-  div.querySelector(".btn-delete").addEventListener("click", () => div.remove());
+const day=days[date.getDay()]
 
-  // --- Drag & Drop ---
-  div.addEventListener("dragstart", e => {
-    div.classList.add("dragging");
-  });
+let list=[...(routines[day]||[])]
 
-  div.addEventListener("dragend", e => {
-    div.classList.remove("dragging");
-  });
+const weekType=getWeekType(date)
+
+list=list.filter(r=>!r.week||r.week==="all"||r.week===weekType)
+
+const key=date.toISOString().slice(0,10)
+
+if(exceptions[key]){
+list=[...list,...exceptions[key]]
 }
 
-// gestion du drop sur le conteneur
-routineEditor.addEventListener("dragover", e => {
-  e.preventDefault();
-  const afterElement = getDragAfterElement(routineEditor, e.clientY);
-  const dragging = routineEditor.querySelector(".dragging");
-  if(afterElement == null){
-    routineEditor.appendChild(dragging);
-  } else {
-    routineEditor.insertBefore(dragging, afterElement);
-  }
-});
-
-// helper pour savoir où insérer
-function getDragAfterElement(container, y){
-  const draggableElements = [...container.querySelectorAll(".routine-edit-row:not(.dragging)")];
-  return draggableElements.reduce((closest, child) => {
-    const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height/2;
-    if(offset < 0 && offset > closest.offset){
-      return {offset: offset, element: child};
-    } else {
-      return closest;
-    }
-  }, {offset: Number.NEGATIVE_INFINITY}).element;
+return{day,list}
 }
+
+function renderDayFromDate(date){
+
+const data=routinesForDate(date)
+
+routineList.innerHTML=""
+
+let list=data.list
+
+if(fatigueMode) list=list.slice(0,1)
+
+list.forEach((item)=>{
+
+const card=document.createElement("div")
+
+card.className=`routine-card routine-${item.type}`
+
+card.innerHTML=`
+<div class="routine-left">
+<div class="routine-time">${item.time}</div>
+<div class="routine-label">${item.label}</div>
+</div>
+`
+
+routineList.appendChild(card)
+
+})
+
+}
+
+dateSelect.addEventListener("change",()=>{
+
+const d=new Date(dateSelect.value)
+
+renderDayFromDate(d)
+
+})
+
+btnFatigue.addEventListener("click",()=>{
+
+fatigueMode=!fatigueMode
+
+btnFatigue.textContent=fatigueMode?"😴 Mode normal":"🔋 Mode fatigue"
+
+renderDayFromDate(new Date(dateSelect.value||new Date()))
+
+})
+
+function generatePlanning(start,weeks=8){
+
+planning8.innerHTML=""
+
+planning8.style.display="block"
+
+routineList.style.display="none"
+
+for(let i=0;i<weeks*7;i++){
+
+const d=new Date(start)
+
+d.setDate(d.getDate()+i)
+
+const data=routinesForDate(d)
+
+const block=document.createElement("div")
+
+block.style.marginBottom="16px"
+
+block.innerHTML=`<b>${d.toLocaleDateString()} (${data.day})</b>`
+
+data.list.forEach(r=>{
+
+const div=document.createElement("div")
+
+div.textContent=`${r.time} ${r.label}`
+
+block.appendChild(div)
+
+})
+
+planning8.appendChild(block)
+
+}
+
+}
+
+btnPlanning.addEventListener("click",()=>{
+
+generatePlanning(new Date(),8)
+
+})
+
+document.getElementById("btnAuto").addEventListener("click",()=>{
+
+const today=new Date()
+
+dateSelect.value=today.toISOString().slice(0,10)
+
+renderDayFromDate(today)
+
+})
+
+const today=new Date()
+
+dateSelect.value=today.toISOString().slice(0,10)
+
+renderDayFromDate(today)
