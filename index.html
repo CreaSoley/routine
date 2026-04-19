@@ -1,69 +1,95 @@
 <!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ceralune – Mes routines</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ceralune – Mes routines</title>
 
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#6b5cff">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6b5cff">
 
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header class="appbar" role="banner">
-  <div class="appbar-inner">
-    <a class="logo" href="index.html" title="Accueil">
-      <img src="logo.png" alt="logo" class="logo-img">
-      <span class="brand-title">Ceralune</span>
-    </a>
+<header class="appbar">
+<div class="appbar-inner">
 
-    <div class="header-actions">
-      <button id="btnNotif" class="btn btn-primary">⏰ Activer rappels</button>
-    </div>
-  </div>
+<a class="logo" href="#">
+<img src="logo.png" class="logo-img">
+<span class="brand-title">Ceralune</span>
+</a>
 
-  <div class="top-controls">
-    <select id="daySelect">
-      <option value="lundi">Lundi</option>
-      <option value="mardi">Mardi</option>
-      <option value="mercredi">Mercredi</option>
-      <option value="jeudi">Jeudi</option>
-      <option value="vendredi">Vendredi</option>
-    </select>
+<div class="header-actions">
+<button id="btnNotif" class="btn btn-primary">⏰ Rappels</button>
+</div>
 
-    <button id="btnAuto" class="btn btn-surprise">🤖 Aujourd’hui sans réfléchir</button>
-    <button id="btnFatigue" class="btn">🔋 Mode fatigue</button>
-    <button id="btnEdit" class="btn btn-primary">✏️ Éditer routines</button>
+</div>
 
-  </div>
+<div class="top-controls">
+
+<select id="daySelect">
+<option value="lundi">Lundi</option>
+<option value="mardi">Mardi</option>
+<option value="mercredi">Mercredi</option>
+<option value="jeudi">Jeudi</option>
+<option value="vendredi">Vendredi</option>
+</select>
+
+<input type="date" id="dateSelect">
+
+<button id="btnAuto" class="btn btn-surprise">🤖 Aujourd’hui</button>
+
+<button id="btnFatigue" class="btn">🔋 Mode fatigue</button>
+
+<button id="btnEdit" class="btn btn-primary">✏️ Éditer</button>
+
+<button id="btnPlanning" class="btn btn-surprise">📅 8 semaines</button>
+
+</div>
+
 </header>
 
-<main class="container" role="main">
-  <div id="routineList" class="routines-grid" aria-live="polite"></div>
+<main class="container">
+
+<div id="routineList" class="routines-grid"></div>
+
+<div id="planning8" style="display:none"></div>
+
 </main>
+
 <div id="editModal" class="modal" style="display:none;">
-  <div class="modal-content">
-    <h2>Modifier les routines</h2>
-    <label for="daySelectEdit">Jour :</label>
-    <select id="daySelectEdit">
-      <option value="lundi">Lundi</option>
-      <option value="mardi">Mardi</option>
-      <option value="mercredi">Mercredi</option>
-      <option value="jeudi">Jeudi</option>
-      <option value="vendredi">Vendredi</option>
-    </select>
-    <div id="routineEditor"></div>
-    <button id="btnAddRoutine" class="btn">➕ Ajouter activité</button>
-    <div style="margin-top:10px;">
-      <button id="btnSaveEdit" class="btn btn-primary">💾 Sauvegarder</button>
-      <button id="btnCloseEdit" class="btn btn-surprise">❌ Fermer</button>
-    </div>
-  </div>
+<div class="modal-content">
+
+<h2>Modifier routines</h2>
+
+<label>Jour</label>
+
+<select id="daySelectEdit">
+<option value="lundi">Lundi</option>
+<option value="mardi">Mardi</option>
+<option value="mercredi">Mercredi</option>
+<option value="jeudi">Jeudi</option>
+<option value="vendredi">Vendredi</option>
+</select>
+
+<div id="routineEditor"></div>
+
+<button id="btnAddRoutine" class="btn">➕ Ajouter</button>
+
+<div style="margin-top:10px">
+
+<button id="btnSaveEdit" class="btn btn-primary">💾 Sauvegarder</button>
+
+<button id="btnCloseEdit" class="btn btn-surprise">❌ Fermer</button>
+
+</div>
+
+</div>
 </div>
 
 <script src="app.js"></script>
+
 </body>
 </html>
