@@ -1,87 +1,56 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ceralune – Calendrier</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ceralune – Mes routines</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6b5cff">
 
 <link rel="stylesheet" href="style.css">
-
-<style>
-
-/* calendrier */
-
-.calendar{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:8px;
-margin-top:20px;
-}
-
-.day{
-background:white;
-border-radius:10px;
-padding:8px;
-min-height:120px;
-box-shadow:0 4px 10px rgba(0,0,0,0.05);
-cursor:pointer;
-}
-
-.day-header{
-font-weight:bold;
-font-size:14px;
-margin-bottom:4px;
-}
-
-.event{
-font-size:12px;
-margin:2px 0;
-padding:2px 4px;
-border-radius:6px;
-background:#eee;
-}
-
-.event-menage{background:#8fd3f455}
-.event-sport{background:#84fab055}
-.event-cerveau{background:#9aa3ff55}
-
-.today{
-outline:2px solid #6b5cff;
-}
-
-</style>
-
 </head>
 
 <body>
 
 <header class="appbar">
-<div class="appbar-inner">
+  <div class="appbar-inner">
 
-<a class="logo">
-<img src="logo.png" class="logo-img">
-<span class="brand-title">Ceralune</span>
-</a>
+    <a class="logo">
+      <img src="logo.png" class="logo-img">
+      <span class="brand-title">Ceralune</span>
+    </a>
 
-<div>
+    <div class="header-actions">
+      <button id="btnToday" class="btn btn-primary">📅 Aujourd’hui</button>
+    </div>
 
-<button id="btnToday" class="btn btn-primary">Aujourd’hui</button>
-<button id="btnAddException" class="btn">Exception</button>
+  </div>
 
-</div>
+  <div class="top-controls">
 
-</div>
+    <select id="daySelect">
+      <option value="lundi">Lundi</option>
+      <option value="mardi">Mardi</option>
+      <option value="mercredi">Mercredi</option>
+      <option value="jeudi">Jeudi</option>
+      <option value="vendredi">Vendredi</option>
+    </select>
+
+    <input type="date" id="dateSelect">
+
+    <button id="btnFatigue" class="btn">🔋 Mode fatigue</button>
+    <button id="btnEdit" class="btn btn-primary">✏️ Éditer routines</button>
+    <button id="btnTheme" class="btn">🎓 Thème formation</button>
+    <button id="btnException" class="btn">⚠️ Exception</button>
+
+  </div>
 </header>
 
 <main class="container">
-
-<h2>Planning 8 semaines</h2>
-
-<div id="calendar" class="calendar"></div>
-
+  <div id="routineList" class="routines-grid"></div>
 </main>
 
 <script src="app.js"></script>
-
 </body>
 </html>
