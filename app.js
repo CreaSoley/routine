@@ -190,6 +190,15 @@ alert("Choisis une date")
 return
 }
 
+const routinesToday=routinesForDate(new Date(date))
+
+const hasFormation=routinesToday.some(r=>r.label.includes("Formation"))
+
+if(!hasFormation){
+alert("Aucune formation ce jour")
+return
+}
+
 const theme=prompt("Thème de la formation")
 
 if(!theme)return
@@ -238,3 +247,40 @@ const today=new Date()
 dateSelect.value=today.toISOString().slice(0,10)
 
 renderDay(today)
+document.getElementById("btnEdit").addEventListener("click",()=>{
+
+const day=daySelect.value
+
+let list=routines[day]
+
+let text=""
+
+list.forEach((r,i)=>{
+
+text+=`${i+1}. ${r.time} ${r.label}\n`
+
+})
+
+const choix=prompt(
+`Routines du ${day}
+
+${text}
+
+Numéro de la routine à modifier :`
+)
+
+if(!choix)return
+
+const index=parseInt(choix)-1
+
+if(!list[index])return
+
+const nouveau=prompt("Nouveau texte",list[index].label)
+
+if(!nouveau)return
+
+list[index].label=nouveau
+
+renderDay(new Date(dateSelect.value))
+
+}
